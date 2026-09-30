@@ -24,9 +24,17 @@ def compare():
     actual=json.loads((WORK/'managed.json').read_text())
     show({k:{'desired':v,'actual':actual.get(k),'match':actual.get(k)==v} for k,v in desired.items()})
 
+def drift():
+    target=WORK/'managed.json'
+    data=json.loads(target.read_text())
+    data['log_level']='DEBUG'
+    target.write_text(json.dumps(data,indent=2))
+    show('Introduced drift: log_level is DEBUG.')
+    
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=['apply', 'compare'])
+    parser.add_argument("action", choices=['apply', 'compare', 'drift'])
     action = parser.parse_args().action
-    tasks = {'apply': apply, 'compare': compare}
+    tasks = {'apply': apply, 'compare': compare, 'drift': drift}
     tasks[action]()
